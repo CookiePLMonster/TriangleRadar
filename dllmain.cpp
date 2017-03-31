@@ -7,33 +7,65 @@
 
 static void (*const TransformRadarPointToScreenSpace)(CVector2D&,const CVector2D&) = (void(*)(CVector2D&,const CVector2D&))0x583480;
 
+static float sign (const CVector2D& p1, const CVector2D& p2, const CVector2D& p3)
+{
+	return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+}
+
+static float clamp( float v, float lo, float hi )
+{
+	return v < lo ? lo : hi < v ? hi : v;
+}
+
 double TriangleRadar(CVector2D& pos)
 {
-	double	dResult = sqrt(pos.x * pos.x + pos.y * pos.y);
+	const double	dResult = sqrt(pos.x * pos.x + pos.y * pos.y);
 
-	if ( dResult > 1.1547005383792515290182975610039 )
+	constexpr CVector2D pointA( 0.0, 1.0 );
+	constexpr CVector2D pointB( 1.0, -1.0 );
+	constexpr CVector2D pointC( -1.0, -1.0 );
+
+	const bool bA = sign(pos, pointA, pointB) < 0.0f;
+	const bool bB = sign(pos, pointB, pointC) < 0.0f;
+	const bool bC = sign(pos, pointC, pointA) < 0.0f;
+
+	if ( bA && bB && bC )
 	{
-		pos.x /= dResult * (1.0/1.1547005383792515290182975610039);
-		pos.y /= dResult * (1.0/1.1547005383792515290182975610039);
+		// Point is inside the triangle, don't calculate anything
+		return dResult;
 	}
 
-	if ( pos.x > 1.0 )
-		pos.x = 1.0;
-	else if ( -1.0 > pos.x )
-		pos.x = -1.0;
-
-	if ( -1.0 > pos.y )
-		pos.y = -1.0;
-
-	if ( pos.x > 0.0 )
+	if ( !bA )
 	{
-		if ( pos.y > ((-2.0 * pos.x) + 1.0) )
-			pos.y = (-2.0 * pos.x) + 1.0;
+		constexpr float m = (pointB.y - pointA.y) / (pointB.x - pointA.x);
+		constexpr float b = pointA.y - (m * pointA.x);
+
+		const float newX = (m * pos.y + pos.x - m * b) / (m * m + 1);
+		const float newY = (m * m * pos.y + m * pos.x + b) / (m * m + 1);
+
+		pos.x = clamp( newX, 0.0f, 1.0f );
+		pos.y = clamp( newY, -1.0f, 1.0f );
 	}
-	else
+	else if ( !bC )
 	{
-		if ( pos.y > ((2.0 * pos.x) + 1.0) )
-			pos.y = (2.0 * pos.x) + 1.0;
+		constexpr float m = (pointA.y - pointC.y) / (pointA.x - pointC.x);
+		constexpr float b = pointC.y - (m * pointC.x);
+
+		const float newX = (m * pos.y + pos.x - m * b) / (m * m + 1);
+		const float newY = (m * m * pos.y + m * pos.x + b) / (m * m + 1);	
+
+		pos.x = clamp( newX, -1.0f, 0.0f );
+		pos.y = clamp( newY, -1.0f, 1.0f );
+	}
+	else if ( !bB )
+	{
+		constexpr float m = (pointC.y - pointB.y) / (pointC.x - pointB.x);
+		constexpr float b = pointB.y - (m * pointB.x);
+
+		const float newX = (m * pos.y + pos.x - m * b) / (m * m + 1);
+
+		pos.x = clamp( newX, -1.0f, 1.0f );
+		pos.y = -1.0f;
 	}
 
 	return dResult;
