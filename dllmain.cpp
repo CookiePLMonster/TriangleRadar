@@ -7,12 +7,12 @@
 
 static void (*const TransformRadarPointToScreenSpace)(CVector2D&,const CVector2D&) = (void(*)(CVector2D&,const CVector2D&))0x583480;
 
-static float sign (const CVector2D& p1, const CVector2D& p2, const CVector2D& p3)
+static constexpr float sign (const CVector2D& p1, const CVector2D& p2, const CVector2D& p3)
 {
 	return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
 }
 
-static float clamp( float v, float lo, float hi )
+static constexpr float clamp( float v, float lo, float hi )
 {
 	return v < lo ? lo : hi < v ? hi : v;
 }
@@ -122,6 +122,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 			// No radardisc
 			InjectHook(0x58A782, 0x58AA2A, PATCH_JUMP );
 		}
+		else return FALSE;
 	}
 	return TRUE;
 }
