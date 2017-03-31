@@ -93,6 +93,9 @@
     <ClInclude Include="Maths.h" />
     <ClInclude Include="MemoryMgr.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TriangleRadar.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
