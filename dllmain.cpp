@@ -43,8 +43,8 @@ double TriangleRadar(CVector2D& pos)
 		const float newX = (m * pos.y + pos.x - m * b) / (m * m + 1);
 		const float newY = (m * m * pos.y + m * pos.x + b) / (m * m + 1);
 
-		pos.x = clamp( newX, 0.0f, 1.0f );
-		pos.y = clamp( newY, -1.0f, 1.0f );
+		pos.x = clamp( newX, pointA.x, pointB.x );
+		pos.y = clamp( newY, pointB.y, pointA.y );
 	}
 	else if ( !bC )
 	{
@@ -54,8 +54,8 @@ double TriangleRadar(CVector2D& pos)
 		const float newX = (m * pos.y + pos.x - m * b) / (m * m + 1);
 		const float newY = (m * m * pos.y + m * pos.x + b) / (m * m + 1);	
 
-		pos.x = clamp( newX, -1.0f, 0.0f );
-		pos.y = clamp( newY, -1.0f, 1.0f );
+		pos.x = clamp( newX, pointC.x, pointA.x );
+		pos.y = clamp( newY, pointC.y, pointA.y );
 	}
 	else if ( !bB )
 	{
@@ -64,8 +64,8 @@ double TriangleRadar(CVector2D& pos)
 
 		const float newX = (m * pos.y + pos.x - m * b) / (m * m + 1);
 
-		pos.x = clamp( newX, -1.0f, 1.0f );
-		pos.y = -1.0f;
+		pos.x = clamp( newX, pointC.x, pointB.x );
+		pos.y = pointC.y;
 	}
 
 	return dResult;
